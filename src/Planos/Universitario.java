@@ -9,7 +9,7 @@ public class Universitario implements Plano {
             int duracao,
             boolean patinete
     ) {
-        if(!patinete){
+        if (!patinete) {
             return (taxaDesbloqueio + (valorMinuto * duracao)) * 0.50;
         }
         return taxaDesbloqueio + (valorMinuto * duracao);

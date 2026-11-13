@@ -9,6 +9,6 @@ public class Mensal implements Plano {
             int duracao,
             boolean patinete
     ) {
-        return valorMinuto * Math.max(0,duracao - 15);
+        return valorMinuto * Math.max(0, duracao - 15);
     }
 }
