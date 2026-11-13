@@ -1,43 +1,60 @@
 public abstract class Veiculo {
 
-    private String codigo;
-    private String tipo;
+    private final String codigo;
+    private final String modelo;
     private Estacao estacao;
-    private EstadoVeiculo estadoVeiculo;
+    private EstadoVeiculo estado = EstadoVeiculo.DISPONIVEL;
 
-    public Veiculo(String codigo, String tipo, Estacao estacao, EstadoVeiculo estadoVeiculo) {
+    protected Veiculo(String codigo, String modelo, Estacao estacaoInicial) {
         this.codigo = codigo;
-        this.tipo = tipo;
-        this.estacao = estacao;
-        this.estadoVeiculo = EstadoVeiculo.DISPONIVEL;
+        this.modelo = modelo;
+        estacaoInicial.receber(this);
+        this.estacao = estacaoInicial;
     }
 
-    public abstract double getTaxaDesbloqueio();
-    public abstract double getValorPorMinuto();
+    public abstract double taxaDesbloqueio();
+    public abstract double valorPorMinuto();
 
     public double calcularTarifa(int minutos) {
-        return getTaxaDesbloqueio() + getValorPorMinuto() * minutos;
+        return taxaDesbloqueio() + valorPorMinuto() * minutos;
     }
 
     public void liberar() {
-        if (estadoVeiculo != EstadoVeiculo.DISPONIVEL) {
+        if (estado != EstadoVeiculo.DISPONIVEL) {
             throw new IllegalStateException("Somente veículos disponíveis podem ser liberados.");
         }
-        estadoVeiculo = EstadoVeiculo.EM_USO;
+        estacao.retirar(this);
+        estacao = null;
+        estado = EstadoVeiculo.EM_USO;
+    }
+
+    public double devolver(Estacao estacao, int minutos) {
+        if (estado != EstadoVeiculo.EM_USO) {
+            throw new IllegalStateException("Veículo não está em uso");
+        }
+        if (minutos < 0) {
+            throw new IllegalArgumentException("Minutos não podem ser negativos");
+        }
+        estacao.receber(this);
+        this.estacao = estacao;
+        estado = EstadoVeiculo.DISPONIVEL;
+        return calcularTarifa(minutos);
     }
 
     public void enviarParaManutencao() {
-        if (estadoVeiculo == EstadoVeiculo.EM_USO) {
+        if (estado == EstadoVeiculo.EM_USO) {
             throw new IllegalStateException("Veículos em uso não podem ir para manutenção.");
         }
-        estadoVeiculo = EstadoVeiculo.EM_MANUTENCAO;
+        estado = EstadoVeiculo.EM_MANUTENCAO;
     }
 
     public void concluirManutencao() {
-        if (estadoVeiculo != EstadoVeiculo.EM_MANUTENCAO) {
+        if (estado != EstadoVeiculo.EM_MANUTENCAO) {
             throw new IllegalStateException("Veíuculo não está em manutenção");
         }
-        estadoVeiculo = EstadoVeiculo.DISPONIVEL;
+        estado = EstadoVeiculo.DISPONIVEL;
     }
+
+    public EstadoVeiculo getEstado() { return estado; }
 
 }

@@ -6,21 +6,23 @@ public class Estacao {
     private final ArrayList<Veiculo> veiculos = new ArrayList<>();
 
     public Estacao(String nome, int vagas) {
+        if (nome == null || nome.isBlank()) throw new IllegalArgumentException("Nome obrigatório.");
         if (vagas <= 0) throw new IllegalArgumentException("Vagas devem ser positivas.");
         this.nome = nome;
         this.vagas = vagas;
     }
 
-    public boolean temVagaLivre() {
+    public boolean temVaga() {
         return veiculos.size() < vagas;
     }
 
     public void receber(Veiculo v) {
-        if (!temVagaLivre()) throw new IllegalArgumentException("Estacao sem vaga.");
+        if (!temVaga()) throw new IllegalStateException("Estação sem vagas.");
         veiculos.add(v);
     }
 
-    public void liberar(Veiculo v) {
+    public void retirar(Veiculo v) {
+        if (!veiculos.remove(v)) throw new IllegalStateException("Veículo não está na estação.");
         veiculos.remove(v);
     }
 
