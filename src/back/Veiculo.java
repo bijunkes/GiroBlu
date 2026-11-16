@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 
 public abstract class Veiculo implements Serializable {
 
+    private static final long serialVersionUID = 1L;
     private final String codigo;
     private final String modelo;
     private Estacao estacao;

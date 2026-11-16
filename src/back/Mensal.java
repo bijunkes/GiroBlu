@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 
 public class Mensal implements Plano {
 
+    private static final long serialVersionUID = 1L;
+
     private static final int MINUTOS_GRATIS = 15;
 
     @Override

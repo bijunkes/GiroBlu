@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 
 public class Universitario implements Plano {
 
+    private static final long serialVersionUID = 1L;
+
     private static final BigDecimal FATOR_DESCONTO = BigDecimal.valueOf(0.5);
 
     @Override

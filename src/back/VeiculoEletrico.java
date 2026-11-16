@@ -4,6 +4,7 @@ public abstract class VeiculoEletrico extends Veiculo {
 
     public static final int CARGA_MINIMA = 20;
 
+    private static final long serialVersionUID = 1L;
     private int bateria;
 
     protected VeiculoEletrico(String codigo, String modelo, Estacao estacaoInicial, int bateria) {

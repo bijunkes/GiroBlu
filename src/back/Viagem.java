@@ -7,6 +7,7 @@ import java.time.Duration;
 
 public class Viagem implements Lancamento {
 
+    private static final long serialVersionUID = 1L;
     private Usuario usuario;
     private Veiculo veiculo;
     private Estacao estacaoOrigem;

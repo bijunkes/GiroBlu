@@ -27,6 +27,7 @@ public class TelaPrincipal extends JFrame {
 
         abas.addTab("Cadastros", new PainelCadastros(sistema, saida));
         abas.addTab("Carteira", new PainelCarteira(sistema, saida));
+        abas.addTab("Pesquisa", new PainelPesquisa(sistema, saida));
     }
 
 }
