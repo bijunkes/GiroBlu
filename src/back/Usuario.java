@@ -25,7 +25,7 @@ public class Usuario implements Serializable {
             throw new RegraDeNegocioException("Email obrigatório.");
         }
         if (plano == null) {
-            throw new RegraDeNegocioException("back.Plano obrigatório.");
+            throw new RegraDeNegocioException("Plano obrigatório.");
         }
         this.nome = nome;
         this.email = email;

@@ -10,18 +10,17 @@ import java.awt.*;
 import java.awt.event.HierarchyEvent;
 import javax.swing.table.DefaultTableCellRenderer;
 
-public class PainelPesquisa extends PainelBase {
+public class PainelConsultas extends PainelBase {
 
-    private static final Color AZUL_CAIXA = new Color(166, 216, 228);
-    private static final Color AZUL_LINHAS = new Color(179, 212, 247);
-    private static final Color AZUL_SELECAO = new Color(120, 170, 230);
-    private static final Color VERDE_AGUA = new Color(0, 168, 181);
+    private final JTextField campoEstacao = new JTextField(14);
+    private final JTextField campoEmailExtrato = new JTextField(20);
+    private final JTextField campoDataInicial = new JTextField(10);
+    private final JTextField campoDataFinal = new JTextField(10);
 
     private enum Categoria {
         VEICULOS("Veículos"),
         ESTACOES("Estações"),
-        USUARIOS("Usuários"),
-        FATURAMENTO("Faturamento");
+        USUARIOS("Usuários");
 
         private final String rotulo;
 
@@ -40,11 +39,15 @@ public class PainelPesquisa extends PainelBase {
     private final JLabel rotuloResumo = new JLabel(" ");
     private Categoria categoriaAtual = Categoria.VEICULOS;
 
-    public PainelPesquisa(Sistema sistema, JTextArea saida) {
+    public PainelConsultas(Sistema sistema, JTextArea saida) {
         super(sistema, saida);
         setLayout(new BorderLayout());
 
-        add(criarCaixaBusca(), BorderLayout.NORTH);
+        JPanel topo = new JPanel(new BorderLayout());
+        topo.add(criarLinhasConsultas(), BorderLayout.NORTH);
+        topo.add(criarCaixaBusca(), BorderLayout.CENTER);
+        add(topo, BorderLayout.NORTH);
+
         add(new JScrollPane(criarTabela()), BorderLayout.CENTER);
 
         rotuloResumo.setFont(rotuloResumo.getFont().deriveFont(Font.BOLD, 13f));
@@ -77,6 +80,62 @@ public class PainelPesquisa extends PainelBase {
         atualizar();
     }
 
+    private JPanel criarLinhasConsultas() {
+        JPanel linhas = new JPanel(new GridLayout(0, 1));
+
+        JPanel linhaDisponiveis = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        linhaDisponiveis.add(new JLabel("Veículos disponíveis - Estação:"));
+        linhaDisponiveis.add(campoEstacao);
+        JButton botaoConsultarDisponiveis = new JButton("Consultar");
+        botaoConsultarDisponiveis.addActionListener(e -> consultarDisponiveis());
+        linhaDisponiveis.add(botaoConsultarDisponiveis);
+        linhas.add(linhaDisponiveis);
+
+        JPanel linhaExtrato = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        linhaExtrato.add(new JLabel("Extrato - E-mail:"));
+        linhaExtrato.add(campoEmailExtrato);
+        JButton botaoEmitirExtrato = new JButton("Emitir extrato");
+        botaoEmitirExtrato.addActionListener(e -> emitirExtrato());
+        linhaExtrato.add(botaoEmitirExtrato);
+        linhas.add(linhaExtrato);
+
+        JPanel linhaFaturamento = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        linhaFaturamento.add(new JLabel("Faturamento de: "));
+        linhaFaturamento.add(campoDataInicial);
+        linhaFaturamento.add(new JLabel("até:"));
+        linhaFaturamento.add(campoDataFinal);
+        JButton botaoConsultarFaturamento = new JButton("Consultar");
+        botaoConsultarFaturamento.addActionListener(e -> consultarFaturamento());
+        linhaFaturamento.add(botaoConsultarFaturamento);
+        linhas.add(linhaFaturamento);
+
+        return linhas;
+    }
+
+    private void consultarDisponiveis() {
+        try {
+            mostrar(sistema.consultarDisponiveis(campoEstacao.getText()));
+        } catch (RegraDeNegocioException e) {
+            mostrarErro(e);
+        }
+    }
+
+    private void emitirExtrato() {
+        try {
+            mostrar(sistema.emitirExtrato(campoEmailExtrato.getText()));
+        } catch (RegraDeNegocioException e) {
+            mostrarErro(e);
+        }
+    }
+
+    private void consultarFaturamento() {
+        try {
+            mostrar(sistema.consultarFaturamento(lerData(campoDataInicial.getText()), lerData(campoDataFinal.getText())));
+        } catch (RegraDeNegocioException e) {
+            mostrarErro(e);
+        }
+    }
+
     private JPanel criarCaixaBusca() {
         JPanel caixa = new JPanel(new GridLayout(0, 1, 0, 6)) {
             @Override
@@ -89,7 +148,6 @@ public class PainelPesquisa extends PainelBase {
             }
         };
         caixa.setOpaque(false);
-        caixa.setBackground(AZUL_CAIXA);
         caixa.setBorder(BorderFactory.createEmptyBorder(10, 16, 10, 16));
 
         JPanel linhaCategorias = new JPanel(new FlowLayout(FlowLayout.CENTER, 6, 0));
@@ -111,8 +169,6 @@ public class PainelPesquisa extends PainelBase {
         linhaBusca.add(new JLabel("Buscar:"));
         linhaBusca.add(campoBusca);
         JButton botaoLimpar = new JButton("Limpar");
-        botaoLimpar.setBackground(VERDE_AGUA);
-        botaoLimpar.setForeground(Color.WHITE);
         botaoLimpar.setFocusPainted(false);
         botaoLimpar.addActionListener(e -> campoBusca.setText(""));
         linhaBusca.add(botaoLimpar);
@@ -128,14 +184,11 @@ public class PainelPesquisa extends PainelBase {
         tabela.setRowHeight(36);
         tabela.setShowGrid(false);
         tabela.setIntercellSpacing(new Dimension(0, 0));
-        tabela.setBackground(AZUL_LINHAS);
-        tabela.setSelectionBackground(AZUL_SELECAO);
         tabela.setSelectionForeground(Color.BLACK);
         tabela.setFillsViewportHeight(true);
         tabela.setAutoCreateRowSorter(true);
 
-        tabela.getTableHeader().setBackground(Color.WHITE);
-        tabela.getTableHeader().setFont(tabela.getTableHeader().getFont().deriveFont(Font.BOLD, 14f));
+        tabela.getTableHeader().setFont(tabela.getTableHeader().getFont().deriveFont(Font.BOLD));
         tabela.getTableHeader().setReorderingAllowed(false);
 
         DefaultTableCellRenderer direita = new DefaultTableCellRenderer();
@@ -155,7 +208,6 @@ public class PainelPesquisa extends PainelBase {
             case VEICULOS -> sistema.pesquisarVeiculos(filtro);
             case ESTACOES -> sistema.pesquisarEstacoes(filtro);
             case USUARIOS -> sistema.pesquisarUsuarios(filtro);
-            case FATURAMENTO -> sistema.pesquisarFaturamento(filtro);
         };
         modelo.setDataVector(resultado.linhas().toArray(new String[0][]), resultado.colunas());
         rotuloResumo.setText(resultado.resumo());

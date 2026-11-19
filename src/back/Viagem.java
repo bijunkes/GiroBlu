@@ -96,7 +96,7 @@ public class Viagem implements Lancamento {
 
     @Override
     public String getDescricao() {
-        return "back.Viagem - " + veiculo.getModelo() + " (" + duracaoMinutos + "min)";
+        return "Viagem - " + veiculo.getModelo() + " (" + duracaoMinutos + "min)";
     }
 
 }

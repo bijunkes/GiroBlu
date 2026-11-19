@@ -17,7 +17,7 @@ public class TelaPrincipal extends JFrame {
         saida.setEditable(false);
         saida.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 12));
         JScrollPane rolagem = new JScrollPane(saida);
-        rolagem.setPreferredSize(new Dimension(0, 220));
+        rolagem.setPreferredSize(new Dimension(0, 150));
 
         JTabbedPane abas = new JTabbedPane();
 
@@ -29,6 +29,7 @@ public class TelaPrincipal extends JFrame {
         abas.addTab("Carteira", new PainelCarteira(sistema, saida));
         abas.addTab("Viagens", new PainelViagens(sistema, saida));
         abas.addTab("Manutenção", new PainelManutencao(sistema, saida));
+        abas.add("Consultas", new PainelConsultas(sistema, saida));
     }
 
 }

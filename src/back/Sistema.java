@@ -234,7 +234,7 @@ public class Sistema implements Serializable {
         List<String[]> linhas = new ArrayList<>();
         for (Usuario u : usuarios) {
             String[] linha = {
-                    u.getNome(),                                     // ASSUMIDO: getNome()
+                    u.getNome(),
                     u.getEmail(),
                     u.getViagemAtual() != null ? "Sim" : "Não"
             };
@@ -244,33 +244,6 @@ public class Sistema implements Serializable {
         }
         return new ResultadoPesquisa(new String[]{"Nome", "E-mail", "Em viagem"},
                 linhas, linhas.size() + " usuário(s)");
-    }
-
-    public ResultadoPesquisa pesquisarFaturamento(String filtro) {
-        DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
-        List<String[]> linhas = new ArrayList<>();
-        BigDecimal total = BigDecimal.ZERO;
-
-        for (Viagem v : viagens) {
-            if (!v.isEncerrada()) {
-                continue;
-            }
-            String[] linha = {
-                    String.valueOf(v.getVeiculo().tipo()),
-                    v.getVeiculo().getCodigo(),
-                    v.getUsuario().getEmail(),                       // ASSUMIDO: getUsuario()
-                    v.getTermino().format(formato),
-                    "R$ " + String.format("%.2f", v.getValorPago())
-            };
-            if (contem(String.join(" ", linha), filtro)) {
-                linhas.add(linha);
-                total = total.add(v.getValorPago());
-            }
-        }
-        return new ResultadoPesquisa(
-                new String[]{"Tipo", "Veículo", "Usuário", "Término", "Valor"},
-                linhas,
-                "TOTAL: " + linhas.size() + " viagem(ns) - R$ " + String.format("%.2f", total));
     }
 
     private boolean contem(String texto, String filtro) {
