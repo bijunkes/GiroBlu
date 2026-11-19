@@ -66,7 +66,7 @@ public class Viagem implements Lancamento {
         if (this.termino != null) {
             throw new RegraDeNegocioException("Esta viagem já foi encerrada.");
         }
-        if (!termino.isAfter(inicio)) {
+        if (termino.isBefore(inicio)) {
             throw new RegraDeNegocioException("O término deve ser posterior ao início.");
         }
 
