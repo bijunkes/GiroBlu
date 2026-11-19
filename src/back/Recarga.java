@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 
 public class Recarga implements Lancamento {
 
+    private static final long serialVersionUID = 1L;
     private final LocalDateTime dataHora;
     private final BigDecimal valor;
 

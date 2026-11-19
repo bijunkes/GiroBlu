@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 public class Estacao implements Serializable {
 
+    private static final long serialVersionUID = 1L;
     private final String nome;
     private final int vagas;
     private final ArrayList<Veiculo> veiculos = new ArrayList<>();
@@ -49,6 +50,14 @@ public class Estacao implements Serializable {
         if (!veiculos.remove(v)) {
             throw new RegraDeNegocioException("Veículo não está na estação.");
         }
+    }
+
+    public int getVagas() {
+        return vagas;
+    }
+
+    public int getVagasLivres() {
+        return vagas - veiculos.size();
     }
 
 }

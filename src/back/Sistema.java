@@ -4,10 +4,13 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.*;
+import java.text.Normalizer;
+import java.time.format.DateTimeFormatter;
 
 public class Sistema implements Serializable {
 
+    private static final long serialVersionUID = 1L;
     private final ArrayList<Estacao> estacoes = new ArrayList<>();
     private final ArrayList<Veiculo> veiculos = new ArrayList<>();
     private final ArrayList<Usuario> usuarios = new ArrayList<>();
@@ -197,4 +200,89 @@ public class Sistema implements Serializable {
         return texto.toString();
     }
 
+    public ResultadoPesquisa pesquisarVeiculos(String filtro) {
+        List<String[]> linhas = new ArrayList<>();
+        for (Veiculo v : veiculos) {
+            String[] linha = {v.getCodigo(), String.valueOf(v.tipo()), v.descricao()};
+            if (contem(String.join(" ", linha), filtro)) {
+                linhas.add(linha);
+            }
+        }
+        return new ResultadoPesquisa(new String[]{"Código", "Tipo", "Descrição"},
+                linhas, linhas.size() + " veículo(s)");
+    }
+
+    public ResultadoPesquisa pesquisarEstacoes(String filtro) {
+        List<String[]> linhas = new ArrayList<>();
+        for (Estacao e : estacoes) {
+            String[] linha = {
+                    e.getNome(),
+                    String.valueOf(e.getVagas()),
+                    String.valueOf(e.getVagasLivres()),
+                    String.valueOf(e.getDisponiveis().size())
+            };
+            if (contem(String.join(" ", linha), filtro)) {
+                linhas.add(linha);
+            }
+        }
+        return new ResultadoPesquisa(
+                new String[]{"Estação", "Vagas", "Vagas livres", "Veículos disponíveis"},
+                linhas, linhas.size() + " estação(ões)");
+    }
+
+    public ResultadoPesquisa pesquisarUsuarios(String filtro) {
+        List<String[]> linhas = new ArrayList<>();
+        for (Usuario u : usuarios) {
+            String[] linha = {
+                    u.getNome(),                                     // ASSUMIDO: getNome()
+                    u.getEmail(),
+                    u.getViagemAtual() != null ? "Sim" : "Não"
+            };
+            if (contem(String.join(" ", linha), filtro)) {
+                linhas.add(linha);
+            }
+        }
+        return new ResultadoPesquisa(new String[]{"Nome", "E-mail", "Em viagem"},
+                linhas, linhas.size() + " usuário(s)");
+    }
+
+    public ResultadoPesquisa pesquisarFaturamento(String filtro) {
+        DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
+        List<String[]> linhas = new ArrayList<>();
+        BigDecimal total = BigDecimal.ZERO;
+
+        for (Viagem v : viagens) {
+            if (!v.isEncerrada()) {
+                continue;
+            }
+            String[] linha = {
+                    String.valueOf(v.getVeiculo().tipo()),
+                    v.getVeiculo().getCodigo(),
+                    v.getUsuario().getEmail(),                       // ASSUMIDO: getUsuario()
+                    v.getTermino().format(formato),
+                    "R$ " + String.format("%.2f", v.getValorPago())
+            };
+            if (contem(String.join(" ", linha), filtro)) {
+                linhas.add(linha);
+                total = total.add(v.getValorPago());
+            }
+        }
+        return new ResultadoPesquisa(
+                new String[]{"Tipo", "Veículo", "Usuário", "Término", "Valor"},
+                linhas,
+                "TOTAL: " + linhas.size() + " viagem(ns) - R$ " + String.format("%.2f", total));
+    }
+
+    private boolean contem(String texto, String filtro) {
+        if (filtro == null || filtro.isBlank()) {
+            return true;
+        }
+        return normalizar(texto).contains(normalizar(filtro));
+    }
+
+    private String normalizar(String s) {
+        return Normalizer.normalize(s, Normalizer.Form.NFD)
+                .replaceAll("\\p{M}", "")
+                .toLowerCase();
+    }
 }

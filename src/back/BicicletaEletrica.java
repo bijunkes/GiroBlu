@@ -4,6 +4,8 @@ import java.math.BigDecimal;
 
 public class BicicletaEletrica extends VeiculoEletrico {
 
+    private static final long serialVersionUID = 1L;
+
     public BicicletaEletrica(String codigo, String modelo, Estacao estacao, int bateria) {
         super(codigo, modelo, estacao, bateria);
     }
